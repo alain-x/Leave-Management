@@ -1,0 +1,11 @@
+.env
+node_modules/
+.DS_Store
+frontend/node_modules/
+backend/target/
+backend/.mvn/
+backend/.idea/
+backend/.vscode/
+backend/.gradle/
+backend/build/
+backend/out/
