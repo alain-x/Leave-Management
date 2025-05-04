@@ -22,7 +22,7 @@ FROM openjdk:17-slim
 WORKDIR /app
 
 # Copy frontend build
-COPY --from=frontend-builder /app/dist /app/frontend
+COPY --from=frontend-builder /app/build /app/frontend
 
 # Copy backend JAR
 COPY --from=builder /app/target/leave-management-0.0.1-SNAPSHOT.jar /app/app.jar
