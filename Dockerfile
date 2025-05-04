@@ -1,13 +1,17 @@
 FROM maven:3.8.6-eclipse-temurin-17 AS builder
 WORKDIR /app
 
-# Copy backend
+# Copy and build backend
 COPY backend/pom.xml ./
 RUN mvn dependency:go-offline
 COPY backend/ .
 RUN mvn clean package -DskipTests
 
-# Copy frontend
+# Use Node.js for frontend build
+FROM node:16-alpine AS frontend-builder
+WORKDIR /app
+
+# Copy and build frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
@@ -18,7 +22,7 @@ FROM openjdk:17-slim
 WORKDIR /app
 
 # Copy frontend build
-COPY --from=builder /app/dist /app/frontend
+COPY --from=frontend-builder /app/dist /app/frontend
 
 # Copy backend JAR
 COPY --from=builder /app/target/app.jar /app/app.jar
