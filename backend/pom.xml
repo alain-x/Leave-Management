@@ -18,9 +18,9 @@
     <description>Leave Management System</description>
     
     <properties>
-        <java.version>22</java.version>
-    </properties>
-    
+    <java.version>17</java.version>
+</properties>
+
     <dependencies>
         <!-- Spring Boot Starters -->
         <dependency>
