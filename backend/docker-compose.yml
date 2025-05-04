@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: leave_management_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: leave_management
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - leave_management_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: leave_management_backend
+    ports:
+      - "9090:9090"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/leave_management
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+    depends_on:
+      - mysql
+    networks:
+      - leave_management_network
+
+volumes:
+  mysql_data:
+
+networks:
+  leave_management_network:
+    driver: bridge

@@ -1,0 +1,170 @@
+.admin-panel {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-panel .card {
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.admin-panel .card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 1rem 1.25rem;
+}
+
+.admin-panel .card-header h3,
+.admin-panel .card-header h5 {
+  margin: 0;
+  color: #343a40;
+  font-weight: 600;
+}
+
+.admin-panel .form-control {
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.admin-panel .form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.admin-panel .custom-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.admin-panel .custom-btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.admin-panel .custom-btn-primary:hover {
+  background-color: #0069d9;
+}
+
+.admin-panel .custom-btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.admin-panel .custom-btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.admin-panel .custom-btn-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.admin-panel .custom-btn-success:hover {
+  background-color: #218838;
+}
+
+.admin-panel .custom-btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.admin-panel .custom-btn-danger:hover {
+  background-color: #c82333;
+}
+
+.admin-panel .table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+}
+
+.admin-panel .table th {
+  border-top: none;
+  font-weight: 600;
+  color: #343a40;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.admin-panel .badge {
+  padding: 0.5em 0.75em;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.admin-panel .badge.bg-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.admin-panel .badge.bg-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.admin-panel .alert {
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-panel .alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.admin-panel .text-center {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.admin-panel .row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.admin-panel .col-md-6 {
+  flex: 0 0 auto;
+  width: 50%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.admin-panel .mb-3 {
+  margin-bottom: 1rem;
+}
+
+.admin-panel .me-2 {
+  margin-right: 0.5rem;
+}
+
+.admin-panel .mt-4 {
+  margin-top: 1.5rem;
+}
+
+.admin-panel .card-body {
+  padding: 1.25rem;
+}
+
+.admin-panel .card-body form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-panel .card-body form .mb-3:last-child {
+  margin-bottom: 0;
+}
