@@ -25,7 +25,7 @@ WORKDIR /app
 COPY --from=frontend-builder /app/dist /app/frontend
 
 # Copy backend JAR
-COPY --from=builder /app/target/app.jar /app/app.jar
+COPY --from=builder /app/target/leave-management-0.0.1-SNAPSHOT.jar /app/app.jar
 
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
