@@ -4,12 +4,12 @@ import {
   Button,
   TextField,
   Typography,
-  Grid,
-  Link,
   Paper,
   Alert,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
-import { GoogleLogin } from "react-google-login";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import "./AuthStyles.css";
@@ -17,27 +17,23 @@ import "./AuthStyles.css";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
     try {
       await login({ email, password });
-      navigate("/dashboard"); // redirect after login
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-    }
-  };
-
-  const handleGoogleLogin = async (response) => {
-    try {
-      await login(response.tokenId);
       navigate("/dashboard");
     } catch (err) {
-      setError("Google login failed");
+      setError(err.response?.data?.message || "Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,118 +45,214 @@ const Login = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(to right, #1e88e5, #90caf9)",
+        background: "#36393f",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        padding: 2,
       }}
     >
       <Paper
-        elevation={6}
+        elevation={0}
         sx={{
           padding: 4,
           width: "100%",
-          maxWidth: 450,
-          borderRadius: 3,
-          backgroundColor: "#fff",
+          maxWidth: 440,
+          borderRadius: 2,
+          backgroundColor: "#2f3136",
+          color: "#dcddde",
         }}
       >
         <Typography
           component="h1"
-          variant="h5"
+          variant="h4"
           align="center"
           gutterBottom
-          className="auth-form h2"
+          sx={{
+            color: "#ffffff",
+            fontWeight: 600,
+            marginBottom: 3,
+          }}
         >
-          Login
+          Welcome back!
         </Typography>
+        <Typography
+          variant="subtitle1"
+          align="center"
+          sx={{
+            color: "#b9bbbe",
+            marginBottom: 4,
+          }}
+        >
+          We're so excited to see you again!
+        </Typography>
+
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }} className="error-message">
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 2,
+              backgroundColor: "#ed4245",
+              color: "#ffffff",
+              "& .MuiAlert-icon": {
+                color: "#ffffff",
+              },
+            }}
+          >
             {error}
           </Alert>
         )}
-        <form onSubmit={handleSubmit} className="form-group">
+
+        <form onSubmit={handleSubmit}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              color: "#b9bbbe",
+              marginBottom: 1,
+              fontWeight: 600,
+            }}
+          >
+            EMAIL
+          </Typography>
           <TextField
             fullWidth
-            label="Email"
             margin="normal"
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#202225",
+                color: "#dcddde",
+                "& fieldset": {
+                  borderColor: "#040405",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#040405",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#5865f2",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "#b9bbbe",
+              },
+            }}
           />
+
+          <Typography
+            variant="subtitle2"
+            sx={{
+              color: "#b9bbbe",
+              marginTop: 2,
+              marginBottom: 1,
+              fontWeight: 600,
+            }}
+          >
+            PASSWORD
+          </Typography>
           <TextField
             fullWidth
-            label="Password"
             margin="normal"
-            type="password"
+            type={showPassword ? "text" : "password"}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    sx={{ color: "#b9bbbe" }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#202225",
+                color: "#dcddde",
+                "& fieldset": {
+                  borderColor: "#040405",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#040405",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#5865f2",
+                },
+              },
+            }}
           />
+
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            className="auth-button"
+            disabled={isLoading}
             sx={{
+              mt: 3,
+              mb: 2,
+              py: 1.5,
+              backgroundColor: "#5865f2",
+              color: "#ffffff",
+              fontWeight: 600,
               "&:hover": {
-                transform: "translateY(-2px)",
-                boxShadow: 3,
+                backgroundColor: "#4752c4",
               },
               "&:disabled": {
+                backgroundColor: "#5865f2",
                 opacity: 0.7,
-                transform: "none",
-                boxShadow: 1,
               },
             }}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
-          <Box className="auth-links" sx={{ mt: 3 }}>
-            <Typography variant="body2" color="text.secondary" align="center">
-              Don't have an account?{" "}
-              <Link href="/register" color="primary">
-                Register
-              </Link>
-            </Typography>
-          </Box>
-          <Box className="auth-links" sx={{ mt: 3 }}>
+
+          <Typography
+            variant="body2"
+            sx={{
+              color: "#b9bbbe",
+              textAlign: "center",
+              mt: 2,
+            }}
+          >
+            Need an account?{" "}
             <Button
-              fullWidth
-              variant="contained"
-              color="secondary"
-              onClick={handle2FA}
-              sx={{ mb: 2 }}
+              variant="text"
+              onClick={() => navigate("/register")}
+              sx={{
+                color: "#00aff4",
+                textTransform: "none",
+                p: 0,
+                "&:hover": {
+                  textDecoration: "underline",
+                  backgroundColor: "transparent",
+                },
+              }}
             >
-              2FA Login
+              Register
             </Button>
-            <GoogleLogin
-              clientId="311505275626-8d5j5bhvjtb0vj8o27p4gg59qpffbad5.apps.googleusercontent.com"
-              buttonText="Login with Google"
-              onSuccess={handleGoogleLogin}
-              onFailure={() => setError("Google login failed")}
-              cookiePolicy={"single_host_origin"}
-              render={(renderProps) => (
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={renderProps.onClick}
-                  disabled={renderProps.disabled}
-                  sx={{ mt: 2 }}
-                  startIcon={
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-                      alt="Google"
-                      style={{ width: 20, height: 20 }}
-                    />
-                  }
-                >
-                  Login with Google
-                </Button>
-              )}
-            />
-          </Box>
+          </Typography>
+
+          <Button
+            fullWidth
+            variant="text"
+            onClick={handle2FA}
+            sx={{
+              mt: 2,
+              color: "#b9bbbe",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+          >
+            2FA Login
+          </Button>
         </form>
       </Paper>
     </Box>
