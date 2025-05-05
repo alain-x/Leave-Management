@@ -1,16 +1,37 @@
 // components/PrivateRoute.js
-import { Navigate } from "react-router-dom";
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { CircularProgress, Box } from "@mui/material";
 
 function PrivateRoute({ children, allowedRoles }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-  if (!user) return <Navigate to="/" />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" />;
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  return typeof children === "function" ? children({ user }) : children;
+  if (!user) {
+    // Redirect to login page but save the attempted url
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    // Redirect to unauthorized page if user's role is not allowed
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
 }
 
 export default PrivateRoute;

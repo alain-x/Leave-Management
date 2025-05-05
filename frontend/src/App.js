@@ -1,7 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { Box } from "@mui/material";
+import { Box, Container, AppBar, Toolbar, Typography, Button, IconButton } from "@mui/material";
+import { Logout as LogoutIcon, Menu as MenuIcon } from "@mui/icons-material";
 import CssBaseline from "@mui/material/CssBaseline";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
@@ -11,60 +12,122 @@ import LeaveRequestForm from "./components/leave/LeaveRequestForm";
 import LeaveHistory from "./components/leave/LeaveHistory";
 import TeamCalendar from "./components/leave/TeamCalendar";
 import AdminPanel from "./components/AdminPanel";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
+import Unauthorized from "./components/Unauthorized";
 
-// Dashboard Component
-function Dashboard({ user }) {
+// Navigation Component
+function Navigation() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  if (!user) return null;
+
   return (
-    <div className="dashboard">
-      <h1>{user.role} Dashboard</h1>
-      <div>
-        <p>
-          Welcome, {user.firstName} {user.lastName}
-        </p>
-        <p>Your Role: {user.role}</p>
-        <nav>
-          {(user.role === "USER" ||
-            user.role === "MANAGER" ||
-            user.role === "ADMIN") && (
+    <AppBar position="static">
+      <Toolbar>
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2 }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          Leave Management System
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          {(user.role === "USER" || user.role === "MANAGER" || user.role === "ADMIN") && (
             <>
-              <Link to="/leave-request" className="dashboard-link">
+              <Button color="inherit" onClick={() => navigate("/leave-request")}>
                 Request Leave
-              </Link>
-              <Link to="/leave-history" className="dashboard-link">
-                View Leave History
-              </Link>
+              </Button>
+              <Button color="inherit" onClick={() => navigate("/leave-history")}>
+                Leave History
+              </Button>
             </>
           )}
           {(user.role === "MANAGER" || user.role === "ADMIN") && (
-            <Link to="/team-calendar" className="dashboard-link">
+            <Button color="inherit" onClick={() => navigate("/team-calendar")}>
               Team Calendar
-            </Link>
+            </Button>
           )}
           {user.role === "ADMIN" && (
-            <Link to="/admin" className="dashboard-link">
+            <Button color="inherit" onClick={() => navigate("/admin")}>
               Admin Panel
-            </Link>
+            </Button>
           )}
-        </nav>
-      </div>
-    </div>
+          <IconButton color="inherit" onClick={handleLogout}>
+            <LogoutIcon />
+          </IconButton>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
 
-// Unauthorized Component
-function Unauthorized() {
-  const navigate = require("react-router-dom").useNavigate();
-  const { user } = require("./contexts/AuthContext").useAuth();
+// Dashboard Component
+function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
-    <div>
-      <h2>Access Denied</h2>
-      <p>You do not have permission to access this page.</p>
-      <p>Your role is: {user?.role || "Not logged in"}</p>
-      <button onClick={() => navigate("/")}>Go to Login</button>
-    </div>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Welcome, {user.firstName} {user.lastName}
+      </Typography>
+      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+        Role: {user.role}
+      </Typography>
+      <Box sx={{ mt: 4, display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))" }}>
+        {(user.role === "USER" || user.role === "MANAGER" || user.role === "ADMIN") && (
+          <>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate("/leave-request")}
+              sx={{ p: 3 }}
+            >
+              Request Leave
+            </Button>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate("/leave-history")}
+              sx={{ p: 3 }}
+            >
+              View Leave History
+            </Button>
+          </>
+        )}
+        {(user.role === "MANAGER" || user.role === "ADMIN") && (
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => navigate("/team-calendar")}
+            sx={{ p: 3 }}
+          >
+            Team Calendar
+          </Button>
+        )}
+        {user.role === "ADMIN" && (
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => navigate("/admin")}
+            sx={{ p: 3 }}
+          >
+            Admin Panel
+          </Button>
+        )}
+      </Box>
+    </Container>
   );
 }
 
@@ -97,11 +160,22 @@ function App() {
       }}>
         <Router>
           <AuthProvider>
+            <Navigation />
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/2fa/verify" element={<TwoFAVerification />} />
               <Route path="/2fa/setup" element={<TwoFASetup />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
 
               <Route
                 path="/leave-request"
@@ -139,16 +213,15 @@ function App() {
                 }
               />
 
+              {/* Catch all route - redirect to dashboard if authenticated, otherwise to login */}
               <Route
-                path="/dashboard"
+                path="*"
                 element={
                   <PrivateRoute>
-                    {({ user }) => <Dashboard user={user} />}
+                    <Navigate to="/dashboard" replace />
                   </PrivateRoute>
                 }
               />
-
-              <Route path="/unauthorized" element={<Unauthorized />} />
             </Routes>
           </AuthProvider>
         </Router>

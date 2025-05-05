@@ -34,36 +34,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      let response;
-      if (typeof credentials === 'string') {
-        // Google login
-        response = await AuthService.loginWithGoogle(credentials);
-      } else {
-        // Regular login
-        response = await AuthService.login(credentials.email, credentials.password);
+      const response = await AuthService.login(credentials.email, credentials.password);
+      if (response.twoFactorEnabled) {
+        return response;
       }
-      
-      // Check if response and token exist
-      if (!response || !response.token) {
-        throw new Error('Invalid response from server');
-      }
-      
-      // Store the token
       localStorage.setItem('token', response.token);
-      setUser(response.user || response);
-      setIs2FAEnabled(!!response.twoFactorEnabled);
-      
-      // Redirect based on role
-      const userRole = (response.user || response).role;
-      if (userRole === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
-      
+      setUser(response.user);
+      setIs2FAEnabled(response.twoFactorEnabled);
       return response;
     } catch (error) {
-      console.error('Login error in AuthContext:', error);
       throw error;
     }
   };
@@ -86,11 +65,31 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const enable2FA = async () => {
+  const verify2FA = async (email, code) => {
     try {
-      const response = await AuthService.enable2FA();
+      const response = await AuthService.verify2FALogin(email, code);
+      localStorage.setItem('token', response.token);
+      setUser(response.user);
       setIs2FAEnabled(true);
       return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const generate2FASecret = async (email) => {
+    try {
+      const response = await AuthService.generate2FASecret(email);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const enable2FA = async () => {
+    try {
+      await AuthService.enable2FA();
+      setIs2FAEnabled(true);
     } catch (error) {
       throw error;
     }
@@ -100,15 +99,6 @@ export const AuthProvider = ({ children }) => {
     try {
       await AuthService.disable2FA();
       setIs2FAEnabled(false);
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const verify2FA = async (code) => {
-    try {
-      const response = await AuthService.verify2FA(code);
-      return response;
     } catch (error) {
       throw error;
     }
@@ -127,9 +117,10 @@ export const AuthProvider = ({ children }) => {
     is2FAEnabled,
     login,
     register,
+    verify2FA,
+    generate2FASecret,
     enable2FA,
     disable2FA,
-    verify2FA,
     logout,
   };
 
@@ -142,7 +133,7 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

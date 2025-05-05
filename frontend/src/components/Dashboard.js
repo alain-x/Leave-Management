@@ -14,6 +14,10 @@ import {
   ListItemText,
   Divider,
   useTheme,
+  Paper,
+  IconButton,
+  Tooltip,
+  Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -26,6 +30,9 @@ import {
   People,
   Settings,
   Add,
+  Person,
+  Logout,
+  Refresh,
 } from "@mui/icons-material";
 import axios from "axios";
 import {
@@ -36,7 +43,7 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
@@ -127,6 +134,113 @@ const Dashboard = ({ user }) => {
     { name: "Rejected", value: stats.rejected, color: COLORS.rejected },
   ];
 
+  const renderWelcomeSection = () => (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        mb: 4,
+        borderRadius: 3,
+        background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.dark} 90%)`,
+        color: 'white',
+      }}
+    >
+      <Grid container alignItems="center" spacing={2}>
+        <Grid item>
+          <Avatar
+            sx={{
+              width: 80,
+              height: 80,
+              bgcolor: 'white',
+              color: theme.palette.primary.main,
+              fontSize: '2rem',
+            }}
+          >
+            {user?.firstName?.charAt(0)}
+          </Avatar>
+        </Grid>
+        <Grid item xs>
+          <Typography variant="h4" gutterBottom>
+            Welcome back, {user?.firstName}!
+          </Typography>
+          <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+            {user?.role} Dashboard
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Box display="flex" gap={1}>
+            <Tooltip title="Refresh Dashboard">
+              <IconButton onClick={fetchDashboardData} sx={{ color: 'white' }}>
+                <Refresh />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Logout">
+              <IconButton onClick={logout} sx={{ color: 'white' }}>
+                <Logout />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Grid>
+      </Grid>
+    </Paper>
+  );
+
+  const renderQuickActions = () => (
+    <Grid container spacing={2} sx={{ mb: 4 }}>
+      <Grid item xs={12}>
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Quick Actions
+        </Typography>
+      </Grid>
+      {[
+        {
+          title: "Request Leave",
+          icon: <Add />,
+          route: "/leave-request",
+          color: theme.palette.primary.main,
+        },
+        {
+          title: "View Calendar",
+          icon: <CalendarToday />,
+          route: "/team-calendar",
+          color: theme.palette.success.main,
+        },
+        {
+          title: "Leave History",
+          icon: <Assignment />,
+          route: "/leave-history",
+          color: theme.palette.info.main,
+        },
+        {
+          title: "Notifications",
+          icon: <Notifications />,
+          route: "/notifications",
+          color: theme.palette.warning.main,
+        },
+      ].map((action, index) => (
+        <Grid item xs={12} sm={6} md={3} key={index}>
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={action.icon}
+            onClick={() => navigate(action.route)}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: action.color,
+              '&:hover': {
+                backgroundColor: action.color,
+                opacity: 0.9,
+              },
+            }}
+          >
+            {action.title}
+          </Button>
+        </Grid>
+      ))}
+    </Grid>
+  );
+
   const renderStatCard = (stat) => (
     <Card
       sx={{
@@ -134,7 +248,7 @@ const Dashboard = ({ user }) => {
         boxShadow: 0,
         border: `1px solid ${theme.palette.divider}`,
         background: stat.color,
-        transition: "transform 0.3s, box-shadow 0.3s",
+        transition: "all 0.3s ease",
         "&:hover": {
           transform: "translateY(-5px)",
           boxShadow: 3,
@@ -144,14 +258,21 @@ const Dashboard = ({ user }) => {
       <CardContent sx={{ p: 2.5 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
               {stat.label}
             </Typography>
             <Typography variant="h4" fontWeight="bold">
               {stat.value}
             </Typography>
           </Box>
-          <Avatar sx={{ bgcolor: "transparent", width: 48, height: 48 }}>
+          <Avatar
+            sx={{
+              bgcolor: "transparent",
+              width: 48,
+              height: 48,
+              color: theme.palette.primary.main,
+            }}
+          >
             {stat.icon}
           </Avatar>
         </Box>
@@ -167,6 +288,79 @@ const Dashboard = ({ user }) => {
         </Grid>
       ))}
     </Grid>
+  );
+
+  const renderLeaveRequests = () => (
+    <Card
+      sx={{
+        borderRadius: 3,
+        boxShadow: 0,
+        border: `1px solid ${theme.palette.divider}`,
+        height: '100%',
+      }}
+    >
+      <CardContent>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" fontWeight="bold">
+            Recent Leave Requests
+          </Typography>
+          <Button
+            size="small"
+            variant="text"
+            endIcon={<Add />}
+            onClick={() => navigate("/leave-approvals")}
+          >
+            View All
+          </Button>
+        </Box>
+        <List sx={{ maxHeight: 400, overflow: "auto" }}>
+          {teamLeaveRequests.map((req) => (
+            <React.Fragment key={req.id}>
+              <ListItem
+                onClick={() => navigate(`/leave-request/${req.id}`)}
+                sx={{
+                  borderRadius: 2,
+                  mb: 1,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${theme.palette.divider}`,
+                  "&:hover": {
+                    backgroundColor: theme.palette.action.hover,
+                    cursor: "pointer",
+                  },
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
+                    {req.employee?.name?.charAt(0) || "U"}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={req.employee?.name || "Unknown User"}
+                  secondary={
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Chip
+                        size="small"
+                        label={req.status}
+                        color={
+                          req.status === "APPROVED"
+                            ? "success"
+                            : req.status === "PENDING"
+                            ? "warning"
+                            : "error"
+                        }
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </ListItem>
+            </React.Fragment>
+          ))}
+        </List>
+      </CardContent>
+    </Card>
   );
 
   const renderAdminPanel = () => (
@@ -221,139 +415,62 @@ const Dashboard = ({ user }) => {
     </>
   );
 
-  const renderManagerPanel = () => (
-    <Grid container spacing={3}>
-      <Grid item xs={12} md={7}>
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: 0,
-            border: `1px solid ${theme.palette.divider}`,
-          }}
-        >
-          <CardContent>
-            <Box display="flex" justifyContent="space-between" mb={2}>
-              <Typography variant="h6" fontWeight="bold">
-                Team Leave Requests
-              </Typography>
-              <Button
-                size="small"
-                variant="text"
-                endIcon={<Add />}
-                onClick={() => navigate("/leave-approvals")}
-              >
-                View All
-              </Button>
-            </Box>
-            <List sx={{ maxHeight: 400, overflow: "auto" }}>
-              {teamLeaveRequests.slice(0, 5).map((req) => (
-                <React.Fragment key={req.id}>
-                  <ListItem
-                    onClick={() => navigate(`/leave-request/${req.id}`)}
-                    sx={{
-                      borderRadius: 2,
-                      backgroundColor:
-                        req.status === "APPROVED"
-                          ? COLORS.approved + "20"
-                          : req.status === "PENDING"
-                          ? COLORS.pending + "20"
-                          : COLORS.rejected + "20",
-                      color:
-                        req.status === "APPROVED"
-                          ? COLORS.approved
-                          : req.status === "PENDING"
-                          ? COLORS.pending
-                          : COLORS.rejected,
-                      border: `1px solid ${
-                        req.status === "APPROVED"
-                          ? COLORS.approved
-                          : req.status === "PENDING"
-                          ? COLORS.pending
-                          : COLORS.rejected
-                      }`,
-                      "&:hover": {
-                        backgroundColor: theme.palette.action.hover,
-                        cursor: "pointer",
-                      },
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar>{req.employee?.name?.charAt(0) || "U"}</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={`${req.employee?.name || "Unknown User"}`}
-                      secondary={`Status: ${req.status}`}
-                    />
-                  </ListItem>
-                  <Divider variant="inset" component="li" />
-                </React.Fragment>
-              ))}
-            </List>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      <Grid item xs={12} md={5}>
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: 0,
-            border: `1px solid ${theme.palette.divider}`,
-          }}
-        >
-          <CardContent>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Leave Statistics
-            </Typography>
-            <Box height={250}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    innerRadius={50}
-                    paddingAngle={5}
-                    label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </Box>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
-  );
-
   return (
-    <Container sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" align="center" gutterBottom>
-        Dashboard
-      </Typography>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      {renderWelcomeSection()}
+      {renderQuickActions()}
       {renderQuickStats()}
+      
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          {renderLeaveRequests()}
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: 0,
+              border: `1px solid ${theme.palette.divider}`,
+              height: '100%',
+            }}
+          >
+            <CardContent>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Leave Statistics
+              </Typography>
+              <Box height={300}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      innerRadius={60}
+                      paddingAngle={5}
+                      label={({ name, percent }) =>
+                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      }
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
       {user?.role === "ADMIN" && renderAdminPanel()}
-      {(user?.role === "MANAGER" || user?.role === "ADMIN") &&
-        renderManagerPanel()}
     </Container>
   );
 };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/login", { replace: true });
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
 
 export default Dashboard;
