@@ -14,7 +14,7 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("${spring.mvc.cors.allowed-origins:http://localhost:4200}")
+    @Value("${spring.mvc.cors.allowed-origins:http://localhost:3000}")
     private String allowedOrigins;
 
     @Value("${spring.mvc.cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS}")
@@ -33,7 +33,7 @@ public class CorsConfig {
         // Set allowed origins with fallback
         configuration.setAllowedOrigins(allowedOrigins != null ? 
             Arrays.asList(allowedOrigins.split(",")) : 
-            Collections.singletonList("http://localhost:4200"));
+            Collections.singletonList("http://localhost:3000"));
         
         // Set allowed methods with fallback
         configuration.setAllowedMethods(allowedMethods != null ? 
