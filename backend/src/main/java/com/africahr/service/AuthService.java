@@ -54,7 +54,20 @@ public class AuthService {
         );
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("User not found"));
+                
+        // If 2FA is enabled, don't generate token yet
+        if (user.isTwoFactorEnabled()) {
+            return AuthResponse.builder()
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .role(user.getRole())
+                    .twoFactorEnabled(true)
+                    .build();
+        }
+        
+        // If 2FA is disabled, generate token and login
         var jwtToken = jwtService.generateToken(user);
         return AuthResponse.builder()
                 .token(jwtToken)
@@ -62,7 +75,7 @@ public class AuthService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .role(user.getRole())
-                .twoFactorEnabled(user.isTwoFactorEnabled())
+                .twoFactorEnabled(false)
                 .build();
     }
 } 

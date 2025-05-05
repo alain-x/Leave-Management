@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import './2FA.css';
+import { Box, Paper } from '@mui/material';
 
 const TwoFASetup = () => {
   const [secret, setSecret] = useState('');
@@ -34,8 +34,30 @@ const TwoFASetup = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-form">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#f5f5f5',
+        padding: 2
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          padding: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          maxWidth: 500,
+          width: '100%',
+          backgroundColor: 'white',
+          borderRadius: 2
+        }}
+      >
         <h2>Setup 2FA</h2>
         {error && <div className="error-message">{error}</div>}
         <div className="qr-container">
@@ -51,8 +73,8 @@ const TwoFASetup = () => {
         <button onClick={enable} className="auth-button">
           Enable 2FA
         </button>
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 };
 

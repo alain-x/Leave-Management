@@ -26,7 +26,7 @@ public class TwoFactorService {
     private final UserRepository userRepository;
     private final Random random = new Random();
 
-    public Map<String, Object> generateSecret(TwoFactorGenerateRequest request) {
+    public TwoFactorResponse generateSecret(TwoFactorGenerateRequest request) {
         Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
         if (userOptional.isEmpty()) {
             throw new RuntimeException("User not found");
@@ -51,16 +51,7 @@ public class TwoFactorService {
             key
         );
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "2FA secret generated");
-        
-        Map<String, Object> data = new HashMap<>();
-        data.put("secret", numericSecret);
-        data.put("qrCodeUrl", qrCodeUrl);
-        data.put("message", "Your 2FA code is: " + numericSecret + ". Please save this code securely.");
-        
-        response.put("data", data);
-        return response;
+        return TwoFactorResponse.create(numericSecret, qrCodeUrl);
     }
 
     public boolean verifyCode(String code) {

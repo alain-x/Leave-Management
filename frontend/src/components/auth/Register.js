@@ -7,10 +7,10 @@ import {
   Alert,
   Select,
   MenuItem,
+  Paper,
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import "./AuthStyles.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -79,8 +79,27 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-form">
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "#36393f",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 2,
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          padding: 4,
+          width: "100%",
+          maxWidth: 500,
+          backgroundColor: "#2f3136",
+          color: "white",
+          borderRadius: 2,
+        }}
+      >
         <Typography component="h1" variant="h5" align="center" gutterBottom>
           Register
         </Typography>
@@ -183,8 +202,8 @@ const Register = () => {
             </Typography>
           </Box>
         </form>
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 };
 

@@ -126,6 +126,79 @@ The backend API runs on `http://localhost:8080`. Here are the main endpoints:
      }
      ```
 
+## API Documentation
+
+API documentation is available at:
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+## API Examples
+
+### Two-Factor Authentication (2FA)
+
+#### 1. Generate 2FA Secret
+```http
+POST /api/auth/2fa/generate
+Content-Type: application/json
+
+{
+    "email": "user@example.com"
+}
+```
+
+**Response:**
+```json
+{
+    "message": "2FA secret generated",
+    "data": {
+        "secret": "123456",
+        "qrCodeUrl": "otpauth://totp/...",
+        "message": "Your 2FA code is: 123456. Please save this code securely."
+    }
+}
+```
+
+#### 2. Verify 2FA Code
+```http
+POST /api/auth/2fa/verify
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+{
+    "code": "123456"
+}
+```
+
+**Success Response:**
+```
+true
+```
+
+#### 3. Enable 2FA
+```http
+POST /api/auth/2fa/enable
+Authorization: Bearer <your_jwt_token>
+```
+
+**Success Response:**
+```json
+{
+    "message": "2FA enabled successfully"
+}
+```
+
+#### 4. Disable 2FA
+```http
+POST /api/auth/2fa/disable
+Authorization: Bearer <your_jwt_token>
+```
+
+**Success Response:**
+```json
+{
+    "message": "2FA disabled successfully"
+}
+```
+
 ## Testing with Postman
 
 1. Create a new POST request to `http://localhost:8080/api/auth/register` with the example user credentials
@@ -160,11 +233,6 @@ The project uses Spring Boot with the following main dependencies:
 - Spring Security
 - Lombok
 - H2 Database (for development)
-
-## API Documentation
-
-API documentation is available at:
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
 
 ## Contributing
 

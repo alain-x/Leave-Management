@@ -8,38 +8,32 @@ const AuthService = {
       email,
       password
     });
-    return response;
+    return response.data;
   },
 
-  loginWithGoogle: async (token) => {
-    const response = await axios.post(`${API_URL}/google`, {
-      token
-    });
-    return response;
+  loginWithGoogle: async (googleResponse) => {
+    try {
+      const { credential } = googleResponse;
+      const response = await axios.post(`${API_URL}/google`, {
+        token: credential
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+    }
   },
 
   register: async (userData) => {
-    const { confirmPassword, ...registerData } = userData;
-    // Add default values for required fields
-    const registrationData = {
-      ...registerData,
-      active: true,
-      department: null,
-      manager: null,
-      profilePicture: null,
-      twoFactorEnabled: false,
-      twoFactorSecret: null,
-      enabled: true
-    };
-    const response = await axios.post(`${API_URL}/register`, registrationData);
-    return response;
+    const response = await axios.post(`${API_URL}/register`, userData);
+    return response.data;
   },
 
   verifyToken: async (token) => {
-    const response = await axios.get(`${API_URL}/verify`, {
+    const response = await axios.get(`${API_URL}/verify-token`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return response;
+    return response.data;
   },
 
   enable2FA: async () => {
@@ -47,7 +41,7 @@ const AuthService = {
     const response = await axios.post(`${API_URL}/2fa/enable`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return response;
+    return response.data;
   },
 
   disable2FA: async () => {
@@ -55,15 +49,15 @@ const AuthService = {
     const response = await axios.post(`${API_URL}/2fa/disable`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return response;
+    return response.data;
   },
 
-  verify2FA: async (code) => {
-    const token = localStorage.getItem('token');
-    const response = await axios.post(`${API_URL}/2fa/verify`, { code }, {
-      headers: { Authorization: `Bearer ${token}` }
+  verify2FALogin: async (email, code) => {
+    const response = await axios.post(`${API_URL}/verify-2fa`, {
+      email,
+      code
     });
-    return response;
+    return response.data;
   },
 
   generate2FASecret: async (email) => {
@@ -71,7 +65,7 @@ const AuthService = {
     const response = await axios.post(`${API_URL}/2fa/generate`, { email }, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return response;
+    return response.data;
   }
 };
 

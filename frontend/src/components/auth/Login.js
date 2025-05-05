@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Typography, TextField, Button, Box, Alert, Link } from "@mui/material";
+import { Typography, TextField, Button, Box, Alert, Link, Paper } from "@mui/material";
 import { GoogleLogin } from "react-google-login";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import "./AuthStyles.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -46,28 +45,49 @@ const Login = () => {
   }, [location]);
 
   return (
-    <div className="auth-container">
-      <div className="auth-form">
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: '#36393f',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 2,
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          padding: 4,
+          width: '100%',
+          maxWidth: 500,
+          backgroundColor: '#2f3136',
+          color: 'white',
+          borderRadius: 2,
+        }}
+      >
         <Typography
           component="h1"
           variant="h5"
           align="center"
           gutterBottom
-          className="auth-form h2"
+          sx={{
+            mb: 2,
+          }}
         >
           Login
         </Typography>
         {successMessage && (
-          <Alert severity="success" sx={{ mb: 2 }} className="success-message">
+          <Alert severity="success" sx={{ mb: 2 }}>
             {successMessage}
           </Alert>
         )}
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }} className="error-message">
+          <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
-        <form onSubmit={handleSubmit} className="form-group">
+        <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
             label="Email"
@@ -90,8 +110,8 @@ const Login = () => {
             type="submit"
             fullWidth
             variant="contained"
-            className="auth-button"
             sx={{
+              mt: 2,
               "&:hover": {
                 transform: "translateY(-2px)",
                 boxShadow: 3,
@@ -105,7 +125,7 @@ const Login = () => {
           >
             Login
           </Button>
-          <Box className="auth-links" sx={{ mt: 3 }}>
+          <Box sx={{ mt: 3 }}>
             <Typography variant="body2" color="text.secondary" align="center">
               Don't have an account?{" "}
               <Link href="/register" color="primary">
@@ -113,7 +133,7 @@ const Login = () => {
               </Link>
             </Typography>
           </Box>
-          <Box className="auth-links" sx={{ mt: 3 }}>
+          <Box sx={{ mt: 3 }}>
             <Button
               fullWidth
               variant="contained"
@@ -150,8 +170,8 @@ const Login = () => {
             />
           </Box>
         </form>
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 };
 

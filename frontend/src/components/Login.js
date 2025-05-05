@@ -12,7 +12,6 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import "./AuthStyles.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");

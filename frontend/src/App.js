@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { Box } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
@@ -12,7 +13,6 @@ import TeamCalendar from "./components/leave/TeamCalendar";
 import AdminPanel from "./components/AdminPanel";
 import { AuthProvider } from "./contexts/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
-import "./styles/dashboard.css";
 
 // Dashboard Component
 function Dashboard({ user }) {
@@ -89,63 +89,70 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/2fa/verify" element={<TwoFAVerification />} />
-            <Route path="/2fa/setup" element={<TwoFASetup />} />
+      <Box sx={{
+        minHeight: '100vh',
+        backgroundColor: '#f5f5f5',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        <Router>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/2fa/verify" element={<TwoFAVerification />} />
+              <Route path="/2fa/setup" element={<TwoFASetup />} />
 
-            <Route
-              path="/leave-request"
-              element={
-                <PrivateRoute allowedRoles={["USER", "MANAGER", "ADMIN"]}>
-                  <LeaveRequestForm />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/leave-request"
+                element={
+                  <PrivateRoute allowedRoles={["USER", "MANAGER", "ADMIN"]}>
+                    <LeaveRequestForm />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/leave-history"
-              element={
-                <PrivateRoute allowedRoles={["USER", "MANAGER", "ADMIN"]}>
-                  <LeaveHistory />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/leave-history"
+                element={
+                  <PrivateRoute allowedRoles={["USER", "MANAGER", "ADMIN"]}>
+                    <LeaveHistory />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/team-calendar"
-              element={
-                <PrivateRoute allowedRoles={["MANAGER", "ADMIN"]}>
-                  <TeamCalendar />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/team-calendar"
+                element={
+                  <PrivateRoute allowedRoles={["MANAGER", "ADMIN"]}>
+                    <TeamCalendar />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/admin"
-              element={
-                <PrivateRoute allowedRoles={["ADMIN"]}>
-                  <AdminPanel />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/admin"
+                element={
+                  <PrivateRoute allowedRoles={["ADMIN"]}>
+                    <AdminPanel />
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  {({ user }) => <Dashboard user={user} />}
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    {({ user }) => <Dashboard user={user} />}
+                  </PrivateRoute>
+                }
+              />
 
-            <Route path="/unauthorized" element={<Unauthorized />} />
-          </Routes>
-        </AuthProvider>
-      </Router>
+              <Route path="/unauthorized" element={<Unauthorized />} />
+            </Routes>
+          </AuthProvider>
+        </Router>
+      </Box>
     </ThemeProvider>
   );
 }

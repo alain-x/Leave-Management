@@ -44,6 +44,14 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse response = authService.login(request);
+            
+            // If 2FA is enabled, return a 202 status code
+            if (response.isTwoFactorEnabled()) {
+                return ResponseEntity.status(HttpStatus.ACCEPTED)
+                        .body(response);
+            }
+            
+            // If 2FA is disabled, return the token
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             return ResponseEntity

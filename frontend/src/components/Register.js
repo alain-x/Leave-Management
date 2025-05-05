@@ -11,9 +11,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
-import "./AuthStyles.css";
-
+import { useAuth } from "../../contexts/AuthContext"; 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
