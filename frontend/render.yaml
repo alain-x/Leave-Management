@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: leave-management-backend
+    env: java
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: leave-management-db
+      - key: DATABASE_USERNAME
+        fromDatabase: leave-management-db
+      - key: DATABASE_PASSWORD
+        fromDatabase: leave-management-db
+
+  - type: web
+    name: leave-management-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://leave-management-backend.onrender.com
+
+  - type: database
+    name: leave-management-db
+    databaseType: mysql
+    plan: free

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Leave Management System Frontend
 
 ## Features
@@ -86,3 +87,39 @@ Create a `.env` file in the root directory with the following variables:
 REACT_APP_API_URL=http://localhost:8081
 REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id
 ```
+=======
+# Leave Management System
+
+A comprehensive leave management system built with Spring Boot and React, featuring Two-Factor Authentication (2FA) for enhanced security.
+
+## 🚀 Live Demo
+[![Live Demo](https://img.shields.io/badge/live-demo-brightgreen)](https://leave-management-4i9g.onrender.com)
+
+## Features
+
+- User Authentication with 2FA
+- Role-based access control (Admin, User)
+- Leave request management
+- Leave balance tracking
+- Google OAuth2 integration
+- Responsive UI with Tailwind CSS
+- RESTful API endpoints
+- Email notifications
+- Docker containerization
+
+## Docker Images
+
+- Frontend: `alaingasore/leave-mgt-system-frontend`
+- Backend: `alaingasore/leave-mgt-system-backend`
+
+## Prerequisites
+
+- Java 17+
+- Node.js 16+
+- Docker
+- MySQL 8.0+
+- Maven 3.8.6+
+- npm
+
+## Project Structure
+>>>>>>> 8ebf040d1d7f7f8713e83acb12feaff56806758d
