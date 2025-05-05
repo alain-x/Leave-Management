@@ -42,17 +42,28 @@ export const AuthProvider = ({ children }) => {
         // Regular login
         response = await AuthService.login(credentials.email, credentials.password);
       }
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data);
-      setIs2FAEnabled(response.data.twoFactorEnabled);
-      const user = response.data;
-      if (user.role === 'ADMIN') {
+      
+      // Check if response and token exist
+      if (!response || !response.token) {
+        throw new Error('Invalid response from server');
+      }
+      
+      // Store the token
+      localStorage.setItem('token', response.token);
+      setUser(response.user || response);
+      setIs2FAEnabled(!!response.twoFactorEnabled);
+      
+      // Redirect based on role
+      const userRole = (response.user || response).role;
+      if (userRole === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
       }
-      return true;
+      
+      return response;
     } catch (error) {
+      console.error('Login error in AuthContext:', error);
       throw error;
     }
   };

@@ -43,18 +43,6 @@ const Register = () => {
       return;
     }
 
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.role
-    ) {
-      setError("All fields are required");
-      setLoading(false);
-      return;
-    }
-
     try {
       await axios.post("http://localhost:8081/api/auth/register", {
         firstName: formData.firstName,
@@ -70,9 +58,17 @@ const Register = () => {
         replace: true,
       });
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Registration failed. Please try again."
-      );
+      if (
+        err.response &&
+        err.response.status === 400 &&
+        err.response.data &&
+        err.response.data.message &&
+        err.response.data.message.includes("already exists")
+      ) {
+        setError("This email is already registered. Please use a different email or log in.");
+      } else {
+        setError(err.response?.data?.message || "Registration failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

@@ -17,11 +17,34 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
+    
+    if (!email || !password) {
+      setError("Please enter both email and password");
+      return;
+    }
+
     try {
-      await login({ email, password });
-      navigate("/dashboard"); // redirect after login
+      console.log('Attempting login with:', { email });
+      const response = await login({ email, password });
+      console.log('Login successful, response:', response);
+      
+      // Check if 2FA is enabled for the user
+      if (response.twoFactorEnabled) {
+        console.log('2FA is enabled, redirecting to verification');
+        navigate('/2fa/verify', { 
+          state: { 
+            email,
+            message: 'Please enter your 2FA code' 
+          } 
+        });
+      } else {
+        console.log('2FA not enabled, redirecting to dashboard');
+        navigate("/dashboard");
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      console.error('Login error:', err);
+      setError(err.message || "Login failed. Please check your credentials and try again.");
     }
   };
 
